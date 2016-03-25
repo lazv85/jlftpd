@@ -1,0 +1,5 @@
+package lftpd;
+
+class CommandFactory{
+    
+}
