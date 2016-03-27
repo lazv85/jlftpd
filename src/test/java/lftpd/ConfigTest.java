@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import java.io.IOException;
+import java.io.File;
 
 import org.junit.Test;
 import java.lang.reflect.*;
@@ -36,11 +38,7 @@ public class ConfigTest{
             output = (String)method.invoke(configIntance, "abc cdb edf");
             assertEquals("abc cdb edf",output);
             
-        }catch(NoSuchMethodException e){
-            throw new RuntimeException(e);
-        }catch( IllegalAccessException e){
-            throw new RuntimeException(e);
-        }catch(InvocationTargetException e){
+        }catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e){
             throw new RuntimeException(e);
         }
     }
@@ -64,11 +62,7 @@ public class ConfigTest{
             output = (String)method.invoke(configIntance, "","default");
             assertEquals("default",output);
             
-        }catch(NoSuchMethodException e){
-            throw new RuntimeException(e);
-        }catch( IllegalAccessException e){
-            throw new RuntimeException(e);
-        }catch(InvocationTargetException e){
+        }catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e){
             throw new RuntimeException(e);
         }
     }
@@ -92,11 +86,25 @@ public class ConfigTest{
             assertNull(output[0]);     
             assertNull(output[1]);
             
-        }catch(NoSuchMethodException e){
+        }catch(NoSuchMethodException | IllegalAccessException | InvocationTargetException e){
             throw new RuntimeException(e);
-        }catch( IllegalAccessException e){
-            throw new RuntimeException(e);
-        }catch(InvocationTargetException e){
+        }
+    }
+    
+    @Test
+    public void testParseFile(){
+        try{
+            File file = new File("src/test/resources/config_test.ini");
+            String absolutePath = file.getAbsolutePath();
+
+            configIntance.parseFile(absolutePath);
+            assertEquals("yes",configIntance.getValue("anonymous_access","system"));
+            assertEquals("/home/ubuntu/workspace:rw",configIntance.getValue("anonymous_dir","system"));
+            assertEquals("123456:/home/ubuntu/workspace:rw",configIntance.getValue("john","users"));
+            assertEquals("1234567:/home/ubuntu/workspace/src:rw",configIntance.getValue("bob","users"));
+            assertNull(configIntance.getValue("bob","users1"));
+
+        }catch(IOException e){
             throw new RuntimeException(e);
         }
     }
