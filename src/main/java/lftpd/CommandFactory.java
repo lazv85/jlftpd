@@ -13,7 +13,7 @@ class CommandFactory{
         if(m.find()){
             String []cmd = new String[2] ;
             cmd[0] = m.group(1) ;
-            cmd[1] = m.group(2) ;
+            cmd[1] = m.group(3) ;
             return cmd;
         }
         return null;
@@ -26,8 +26,15 @@ class CommandFactory{
             return new Command(commandText,null);
         }
         
+        System.out.println("cmd = " + cmd[0]);
+        System.out.println("prm = " + cmd[1]);
+        
         if(cmd[0].equals("USER")){
             return new User(cmd[0],cmd[1]);
+        }
+        
+        if(cmd[0].equals("PASS")){
+            return new Pass(cmd[0],cmd[1]);
         }
         
         return new Command(commandText,null);

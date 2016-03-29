@@ -39,21 +39,49 @@ public class Server {
     
     private void authorize(PrintWriter pw, BufferedReader br) throws IOException{
         
-        ICommand usr = CommandFactory.getCommand(br.readLine());
+        boolean authorized = false;
+        do{
+            
+            ICommand usr = CommandFactory.getCommand(br.readLine());
         
-        if(usr.getCommand().equals("USER")){
-            pw.println("230 Login successful");
-        }
+            pw.println(usr.getResponse());
+            
+            if(usr.getStatus() == CommandStatus.CMD_OK && usr.getCommand().equals("USER")){
+                authorized = true;
+            }else if(usr.getStatus() != CommandStatus.CMD_OK && usr.getCommand().equals("USER")){
+                ICommand pass = CommandFactory.getCommand(br.readLine());
+                
+                if(pass.getCommand().equals("PASS")){
+                    ((Pass)pass).authorize(usr.getParameter());
+                    if(pass.getStatus() == CommandStatus.CMD_OK){
+                        authorized = true;
+                    }
+                }
+                pw.println(pass.getResponse());
+            }
+            
+        }while(!authorized);
         
     }
     
+    private void serveClient(PrintWriter pw, BufferedReader br) throws IOException{
+        ICommand cmd;
+        do{
+            
+            cmd = CommandFactory.getCommand(br.readLine());
+            pw.println(cmd.getResponse());
+            
+        }while(!cmd.getCommand().equals("QUIT"));
+        
+    }
+     
     private int getServerPort(){
         int portNumber ;
         
         try{
             portNumber = Integer.parseInt(cfg.getValue("port","system"));
         }catch(Exception e){
-            portNumber = 21; //default port of ftp server
+            portNumber = 21;
         }
         
         return portNumber;
@@ -67,6 +95,7 @@ public class Server {
         ) {
             sayHello(out);
             authorize(out, in);
+            serveClient(out, in);
         }
     }
     

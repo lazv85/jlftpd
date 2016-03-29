@@ -1,8 +1,9 @@
 package lftpd;
 
 public class Command implements ICommand{
-    private String cmd;
-    private String param;
+    protected String cmd;
+    protected String param;
+    protected CommandStatus cmdStatus = CommandStatus.CMD_NOT_RUN;
     
     public Command(String cmd, String param){
         this.cmd = cmd;
@@ -17,5 +18,16 @@ public class Command implements ICommand{
     @Override
     public String getParameter(){
         return this.param;
+    }
+    
+    @Override
+    public CommandStatus getStatus(){
+        return CommandStatus.CMD_WRONG_CMD;
+    }
+    
+    @Override
+    public String getResponse(){
+        String str = "202 command: " + this.cmd + " is not supported" ;
+        return str;
     }
 }
