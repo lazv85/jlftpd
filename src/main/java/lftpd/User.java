@@ -3,8 +3,8 @@ package lftpd;
 public class User extends Command implements ICommand{
     private Config cfg = Config.getInstance();
     
-    public User(String cmd, String param){
-        super(cmd, param);
+    public User(String cmd, String param, SessionState session){
+        super(cmd, param,session);
         
         String user = cfg.getValue(param, "users");
         String anonAccess = cfg.getValue("anonymous_access","system");

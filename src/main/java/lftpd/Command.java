@@ -4,10 +4,12 @@ public class Command implements ICommand{
     protected String cmd;
     protected String param;
     protected CommandStatus cmdStatus = CommandStatus.CMD_NOT_RUN;
+    protected SessionState session;
     
-    public Command(String cmd, String param){
+    public Command(String cmd, String param, SessionState session){
         this.cmd = cmd;
         this.param = param;
+        this.session = session;
     }
     
     @Override
@@ -29,5 +31,10 @@ public class Command implements ICommand{
     public String getResponse(){
         String str = "202 command: " + this.cmd + " is not supported" ;
         return str;
+    }
+    
+    @Override
+    public SessionState getSessionState(){
+        return session;
     }
 }

@@ -1,8 +1,8 @@
 package lftpd;
 
 public class Syst extends Command implements ICommand{
-    public Syst(String cmd, String param){
-        super(cmd, param);
+    public Syst(String cmd, String param, SessionState session){
+        super(cmd, param, session);
     }
     
     @Override

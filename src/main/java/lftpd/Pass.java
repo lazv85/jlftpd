@@ -7,8 +7,8 @@ public class Pass extends Command implements ICommand{
     
     private String userName;
     
-    public Pass(String cmd, String param){
-        super(cmd,param);
+    public Pass(String cmd, String param, SessionState session){
+        super(cmd,param, session);
     }
     
     @Override

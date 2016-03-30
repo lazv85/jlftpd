@@ -15,11 +15,15 @@ public class Server {
     public class ServerProcess implements Runnable{
         private PrintWriter pw;
         private BufferedReader br;
+        private String localAddress;
+        private String remoteAddress;
         
-        public ServerProcess(Socket clientSocket){
+        public ServerProcess( Socket clientSocket){
             try{
                 pw = new PrintWriter(clientSocket.getOutputStream(), true);
                 br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                remoteAddress = clientSocket.getInetAddress().getHostAddress();
+                localAddress = clientSocket.getLocalAddress().getHostAddress();
             }catch(Exception e){
                 log.log(Level.INFO, "cannot open streams");
             }
@@ -28,9 +32,11 @@ public class Server {
         @Override
         public void run() {
             try{
+                SessionState session;
+                
                 sayHello(pw);
-                authorize(pw, br);
-                serveClient(pw, br);
+                session = authorize(pw, br, localAddress, remoteAddress);
+                serveClient(pw, br, session);
             }catch(Exception e){
                 log.log(Level.INFO, "thread completed");
             }
@@ -65,9 +71,10 @@ public class Server {
         pw.println("220 Hey there");
     }
     
-    private void authorize(PrintWriter pw, BufferedReader br) throws IOException{
+    private SessionState authorize(PrintWriter pw, BufferedReader br, String localAddress, String remoteAddress) throws IOException{
         
         boolean authorized = false;
+        SessionState session = new SessionState();
         do{
             
             ICommand usr = CommandFactory.getCommand(br.readLine());
@@ -75,6 +82,7 @@ public class Server {
             pw.println(usr.getResponse());
             
             if(usr.getStatus() == CommandStatus.CMD_OK && usr.getCommand().equals("USER")){
+                session = new SessionState(usr.getParameter(), cfg.getValue("anonymous_dir","system"), localAddress, remoteAddress);
                 authorized = true;
             }else if(usr.getStatus() != CommandStatus.CMD_OK && usr.getCommand().equals("USER")){
                 ICommand pass = CommandFactory.getCommand(br.readLine());
@@ -82,24 +90,24 @@ public class Server {
                 if(pass.getCommand().equals("PASS")){
                     ((Pass)pass).authorize(usr.getParameter());
                     if(pass.getStatus() == CommandStatus.CMD_OK){
+                        session = new SessionState(usr.getParameter(), cfg.getValue(usr.getParameter(),"users"), localAddress, remoteAddress);
                         authorized = true;
                     }
                 }
                 pw.println(pass.getResponse());
                 pass = null;
             }
-            
             usr = null;
-            
-            
         }while(!authorized);
         
+        return session;
     }
     
-    private void serveClient(PrintWriter pw, BufferedReader br) throws IOException{
+    private void serveClient(PrintWriter pw, BufferedReader br, SessionState session) throws IOException{
         ICommand cmd;
         do{
-            cmd = CommandFactory.getCommand(br.readLine());
+            cmd = CommandFactory.getCommand(br.readLine(), session);
+            session = cmd.getSessionState();
             pw.println(cmd.getResponse());
         }while(!cmd.getCommand().equals("QUIT"));
         
@@ -119,7 +127,7 @@ public class Server {
     
     private void processConnection(ServerSocket serverSocket) throws IOException{
             Socket clientSocket = serverSocket.accept();
-            Runnable process = new ServerProcess(clientSocket);
+            Runnable process = new ServerProcess( clientSocket);
             executor.execute(process);
     }
     
