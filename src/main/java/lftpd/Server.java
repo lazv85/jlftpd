@@ -7,13 +7,41 @@ import java.net.ServerSocket;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.InputStreamReader;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
+   
+    public class ServerProcess implements Runnable{
+        private PrintWriter pw;
+        private BufferedReader br;
+        
+        public ServerProcess(Socket clientSocket){
+            try{
+                pw = new PrintWriter(clientSocket.getOutputStream(), true);
+                br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            }catch(Exception e){
+                log.log(Level.INFO, "cannot open streams");
+            }
+        }
+        
+        @Override
+        public void run() {
+            try{
+                sayHello(pw);
+                authorize(pw, br);
+                serveClient(pw, br);
+            }catch(Exception e){
+                log.log(Level.INFO, "thread completed");
+            }
+        }
+    }
     
     private static Server instance = new Server();
     private Logger log = Logger.getLogger(Server.class.getName());
     private Config cfg = Config.getInstance();
     private boolean configLoaded = false;
+    private ExecutorService executor = Executors.newCachedThreadPool();
     
     private  Server() {
      
@@ -58,7 +86,11 @@ public class Server {
                     }
                 }
                 pw.println(pass.getResponse());
+                pass = null;
             }
+            
+            usr = null;
+            
             
         }while(!authorized);
         
@@ -67,10 +99,8 @@ public class Server {
     private void serveClient(PrintWriter pw, BufferedReader br) throws IOException{
         ICommand cmd;
         do{
-            
             cmd = CommandFactory.getCommand(br.readLine());
             pw.println(cmd.getResponse());
-            
         }while(!cmd.getCommand().equals("QUIT"));
         
     }
@@ -88,15 +118,9 @@ public class Server {
     }
     
     private void processConnection(ServerSocket serverSocket) throws IOException{
-        try (
             Socket clientSocket = serverSocket.accept();
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        ) {
-            sayHello(out);
-            authorize(out, in);
-            serveClient(out, in);
-        }
+            Runnable process = new ServerProcess(clientSocket);
+            executor.execute(process);
     }
     
     public void loop() throws IOException,RuntimeException {

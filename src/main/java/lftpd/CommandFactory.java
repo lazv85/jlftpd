@@ -37,6 +37,10 @@ class CommandFactory{
             return new Pass(cmd[0],cmd[1]);
         }
         
+        if(cmd[0].equals("SYST")){
+            return new Syst(cmd[0],cmd[1]);
+        }
+        
         return new Command(commandText,null);
     }
 }
