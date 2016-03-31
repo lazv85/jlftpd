@@ -127,10 +127,10 @@ public class Server {
             
             if(cmd.isNetwork()){
                 sock = ((INetwork)cmd).getSocket();
-                pw.println(cmd.getResponse());
             }else{
-                pw.println(cmd.getResponse());
+                
                 if(sock != null && cmd.isData()){
+                    pw.println(((IData)cmd).transferStatus());
                     ((IData)cmd).transferData(sock);
                     sock.close();
                     sock = null;
@@ -141,7 +141,7 @@ public class Server {
             }
             
             session = cmd.getSessionState();
-            
+            pw.println(cmd.getResponse());
         }while(!cmd.getCommand().equals("QUIT"));
         
     }

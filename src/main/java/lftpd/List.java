@@ -36,5 +36,11 @@ public class List extends Command implements ICommand, IData{
     public void transferData(Socket sock) throws IOException{
         PrintWriter pw = new PrintWriter(sock.getOutputStream(), true);
         pw.println("new file");
+        cmdStatus = CommandStatus.CMD_OK;
+    }
+    
+    @Override
+    public String transferStatus(){
+        return "150 Here comes info";
     }
 }
