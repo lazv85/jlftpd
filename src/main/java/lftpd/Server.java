@@ -13,17 +13,12 @@ import java.util.concurrent.Executors;
 public class Server {
    
     public class ServerProcess implements Runnable{
-        private PrintWriter pw;
-        private BufferedReader br;
-        private String localAddress;
-        private String remoteAddress;
+        
+        private Socket sock;
         
         public ServerProcess( Socket clientSocket){
             try{
-                pw = new PrintWriter(clientSocket.getOutputStream(), true);
-                br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                remoteAddress = clientSocket.getInetAddress().getHostAddress();
-                localAddress = clientSocket.getLocalAddress().getHostAddress();
+                sock = clientSocket;
             }catch(Exception e){
                 log.log(Level.INFO, "cannot open streams");
             }
@@ -34,9 +29,9 @@ public class Server {
             try{
                 SessionState session;
                 
-                sayHello(pw);
-                session = authorize(pw, br, localAddress, remoteAddress);
-                serveClient(pw, br, session);
+                sayHello(sock);
+                session = authorize(sock);
+                serveClient(sock, session);
             }catch(Exception e){
                 log.log(Level.INFO, "thread completed");
             }
@@ -67,15 +62,27 @@ public class Server {
         }
     }
 
-    private void sayHello(PrintWriter pw) throws IOException{
+    private void sayHello(Socket clientSocket) throws IOException{
+
+        PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
+        BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
         pw.println("220 Hey there");
+
     }
     
-    private SessionState authorize(PrintWriter pw, BufferedReader br, String localAddress, String remoteAddress) throws IOException{
+    private SessionState authorize(Socket clientSocket) throws IOException{
         
         boolean authorized = false;
         SessionState session = new SessionState();
+        
+        
+        PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
+        BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        
         do{
+            String remoteAddress = clientSocket.getInetAddress().getHostAddress();
+            String localAddress = clientSocket.getLocalAddress().getHostAddress(); 
             
             ICommand usr = CommandFactory.getCommand(br.readLine());
         
@@ -103,12 +110,38 @@ public class Server {
         return session;
     }
     
-    private void serveClient(PrintWriter pw, BufferedReader br, SessionState session) throws IOException{
+    private void serveClient(Socket clientSocket, SessionState session) throws IOException{
         ICommand cmd;
+
+        PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
+        BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        Socket sock = null;
+        
         do{
             cmd = CommandFactory.getCommand(br.readLine(), session);
+            
+            if(cmd.isNetwork() && sock!= null){
+                sock.close();
+                sock = null;
+            }
+            
+            if(cmd.isNetwork()){
+                sock = ((INetwork)cmd).getSocket();
+                pw.println(cmd.getResponse());
+            }else{
+                pw.println(cmd.getResponse());
+                if(sock != null && cmd.isData()){
+                    ((IData)cmd).transferData(sock);
+                    sock.close();
+                    sock = null;
+                }else if(sock != null){
+                    sock.close();
+                    sock = null;
+                }
+            }
+            
             session = cmd.getSessionState();
-            pw.println(cmd.getResponse());
+            
         }while(!cmd.getCommand().equals("QUIT"));
         
     }

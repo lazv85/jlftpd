@@ -6,4 +6,6 @@ public interface ICommand{
     public String getResponse();
     public CommandStatus getStatus();
     public SessionState getSessionState();
+    public boolean isNetwork();
+    public boolean isData();
 }

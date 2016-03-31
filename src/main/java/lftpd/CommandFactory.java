@@ -52,6 +52,13 @@ class CommandFactory{
             return new Pwd(cmd[0],cmd[1],session);
         }
         
+        if(cmd[0].equals("PORT")){
+            return new Port(cmd[0],cmd[1],session);
+        }
+        
+        if(cmd[0].equals("LIST")){
+            return new List(cmd[0],cmd[1],session);
+        }
         return new Command(commandText,null, session);
     }
 }

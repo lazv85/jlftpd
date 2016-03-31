@@ -13,6 +13,24 @@ public class Command implements ICommand{
     }
     
     @Override
+    public boolean isNetwork(){
+        if(this.cmd.equals("PORT") || this.cmd.equals("PASV") || this.cmd.equals("EPRT") || this.cmd.equals("EPSV")){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    @Override
+    public boolean isData(){
+        if(this.cmd.equals("LIST")){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    @Override
     public String getCommand(){
         return this.cmd;
     }
