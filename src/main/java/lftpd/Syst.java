@@ -11,8 +11,5 @@ public class Syst extends Command implements ICommand{
         return str;
     }
     
-    @Override
-    public CommandStatus getStatus(){
-        return CommandStatus.CMD_OK;
-    }
+   
 }

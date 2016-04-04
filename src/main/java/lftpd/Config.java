@@ -25,7 +25,6 @@ public final class Config {
     
     private String clearComment(String str){
         Pattern ptr = Pattern.compile("(^[^#]*)#?");
-        //Pattern ptr = Pattern.compile("(a)bc");
         Matcher m = ptr.matcher(str);
         if(m.find()){
             str = m.group(1);

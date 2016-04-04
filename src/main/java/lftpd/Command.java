@@ -3,8 +3,8 @@ package lftpd;
 public class Command implements ICommand{
     protected String cmd;
     protected String param;
-    protected CommandStatus cmdStatus = CommandStatus.CMD_NOT_RUN;
     protected SessionState session;
+    protected int responseCode = ResponseCode.CODE_202_Command_not_implemented;
     
     public Command(String cmd, String param, SessionState session){
         this.cmd = cmd;
@@ -41,18 +41,18 @@ public class Command implements ICommand{
     }
     
     @Override
-    public CommandStatus getStatus(){
-        return CommandStatus.CMD_WRONG_CMD;
-    }
-    
-    @Override
     public String getResponse(){
-        String str = "202 command: " + this.cmd + " is not supported" ;
+        String str = "202 command: " + this.cmd + " is not implemented" ;
         return str;
     }
     
     @Override
     public SessionState getSessionState(){
         return session;
+    }
+    
+    @Override
+    public int getResponseCode(){
+        return responseCode;
     }
 }

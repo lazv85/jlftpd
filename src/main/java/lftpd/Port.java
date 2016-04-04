@@ -21,38 +21,39 @@ public class Port extends Command implements ICommand, INetwork{
         if(m.find()){
             remoteIpAddr = m.group(1).replace(',','.');
             remotePort = Integer.parseInt(m.group(2))*256 + Integer.parseInt(m.group(3));
-            cmdStatus = CommandStatus.CMD_NOT_RUN;
+            responseCode = ResponseCode.CODE_225_Data_connection_open;
         }else{
-            cmdStatus = CommandStatus.CMD_ERR;
+            responseCode = ResponseCode.CODE_501_Syntax_error_in_parameters;
         }
     }
     
     @Override
     public String getResponse(){
-        if(cmdStatus == CommandStatus.CMD_OK){
+        if(responseCode == ResponseCode.CODE_225_Data_connection_open){
             return "225 Data connection open; no transfer in progress.";
-        }else if (cmdStatus == CommandStatus.CMD_ERR){
+        }else if (responseCode == ResponseCode.CODE_425_Cant_open_data_connection){
             return "425 Can't open data connection.";
-        }else if (cmdStatus == CommandStatus.CMD_NOT_RUN){
-            return "425 Can't open data connection.";
+        }else if (responseCode == ResponseCode.CODE_501_Syntax_error_in_parameters){
+            return "501 Syntax error in command parameters";
         }else{
             return  "425 Can't open data connection.";
         }
     }
-    
-    @Override
-    public CommandStatus getStatus(){
-        return cmdStatus;
-    }
+
     
     @Override
     public Socket getSocket() throws IOException, UnknownHostException{
-        if(cmdStatus == CommandStatus.CMD_ERR){
+        if(responseCode == ResponseCode.CODE_501_Syntax_error_in_parameters){
             return null;
         }
+        Socket sock = null;
         
-        Socket sock = new Socket( InetAddress.getByName(remoteIpAddr) , remotePort);
-        cmdStatus = CommandStatus.CMD_OK;
+        try {
+         sock = new Socket( InetAddress.getByName(remoteIpAddr) , remotePort);
+         responseCode = ResponseCode.CODE_225_Data_connection_open;    
+        } catch(Exception e) {
+         responseCode = ResponseCode.CODE_425_Cant_open_data_connection;    
+        }
         
         return sock;
     }

@@ -10,8 +10,4 @@ public class Pwd extends Command implements ICommand{
         return "257 " +"\"" + session.getCurrentDir() + "\"";
     }
     
-    @Override
-    public CommandStatus getStatus(){
-        return CommandStatus.CMD_OK;
-    }
 }

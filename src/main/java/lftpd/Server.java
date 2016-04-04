@@ -17,11 +17,7 @@ public class Server {
         private Socket sock;
         
         public ServerProcess( Socket clientSocket){
-            try{
                 sock = clientSocket;
-            }catch(Exception e){
-                log.log(Level.INFO, "cannot open streams");
-            }
         }
         
         @Override
@@ -88,15 +84,15 @@ public class Server {
         
             pw.println(usr.getResponse());
             
-            if(usr.getStatus() == CommandStatus.CMD_OK && usr.getCommand().equals("USER")){
+            if(usr.getResponseCode() == ResponseCode.CODE_230_User_logged_in && usr.getCommand().equals("USER")){
                 session = new SessionState(usr.getParameter(), cfg.getValue("anonymous_dir","system"), localAddress, remoteAddress);
                 authorized = true;
-            }else if(usr.getStatus() != CommandStatus.CMD_OK && usr.getCommand().equals("USER")){
+            }else if(usr.getResponseCode() != ResponseCode.CODE_230_User_logged_in && usr.getCommand().equals("USER")){
                 ICommand pass = CommandFactory.getCommand(br.readLine());
                 
                 if(pass.getCommand().equals("PASS")){
                     ((Pass)pass).authorize(usr.getParameter());
-                    if(pass.getStatus() == CommandStatus.CMD_OK){
+                    if(pass.getResponseCode() == ResponseCode.CODE_230_User_logged_in){
                         session = new SessionState(usr.getParameter(), cfg.getValue(usr.getParameter(),"users"), localAddress, remoteAddress);
                         authorized = true;
                     }
@@ -130,7 +126,7 @@ public class Server {
             }else{
                 
                 if(sock != null && cmd.isData()){
-                    pw.println(((IData)cmd).transferStatus());
+                    pw.println(cmd.getResponse());
                     ((IData)cmd).transferData(sock);
                     sock.close();
                     sock = null;

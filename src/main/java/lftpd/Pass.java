@@ -14,19 +14,14 @@ public class Pass extends Command implements ICommand{
     @Override
     public String getResponse(){
         String str ;
-        if(cmdStatus == CommandStatus.CMD_OK){
+        if(responseCode == ResponseCode.CODE_230_User_logged_in){
             str = "230 Login successful";
         }else{
             str = "430 Invalid user name or password";
         }
         return str;
     }
-    
-    @Override
-    public CommandStatus getStatus(){
-        return cmdStatus;
-    }
-    
+   
     public void authorize(String userName){
         String str = cfg.getValue(userName,"users");
         Pattern ptr = Pattern.compile("([^:]+):([^:]+):([^:]+)");
@@ -35,12 +30,12 @@ public class Pass extends Command implements ICommand{
         
         if(m.find()){
             String configPassword = m.group(1);
-            cmdStatus = CommandStatus.CMD_ERR;
+            responseCode = ResponseCode.CODE_430_Invalid_username_or_password;
             if(configPassword.equals(param)){
-                cmdStatus = CommandStatus.CMD_OK;
+                responseCode = ResponseCode.CODE_230_User_logged_in;
             }
         }else{
-            cmdStatus = CommandStatus.CMD_ERR;
+            responseCode = ResponseCode.CODE_430_Invalid_username_or_password;
         }
     }
 

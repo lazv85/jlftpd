@@ -10,9 +10,9 @@ public class User extends Command implements ICommand{
         String anonAccess = cfg.getValue("anonymous_access","system");
 
         if(user == null && anonAccess.equals("yes")){
-            cmdStatus = CommandStatus.CMD_OK;
+            responseCode = ResponseCode.CODE_230_User_logged_in;
         }else{
-            cmdStatus = CommandStatus.CMD_ERR;
+            responseCode = ResponseCode.CODE_331_User_name_ok_need_password;
         }
         
         
@@ -22,16 +22,12 @@ public class User extends Command implements ICommand{
     public String getResponse(){
         String str = new String();
         
-        if(cmdStatus == CommandStatus.CMD_OK){
+        if(responseCode == ResponseCode.CODE_230_User_logged_in){
             str = "230 Login successful";
-        }else if(cmdStatus == CommandStatus.CMD_ERR){
+        }else if(responseCode == ResponseCode.CODE_331_User_name_ok_need_password){
             str = "331 user name is correct, password is required for " + param;
         }
         return str;
     }
-    
-    @Override
-    public CommandStatus getStatus(){
-        return cmdStatus;
-    }
+
 }
