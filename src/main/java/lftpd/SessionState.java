@@ -25,7 +25,7 @@
         
             if(m.find()){
                 currentDir = m.group(2);
-                rootDir = m.group(2);
+                rootDir = m.group(2) ;
                 permissions = m.group(3);
             }else{
                 currentDir = "/";
@@ -68,5 +68,9 @@
         
         public String getTypeFile(){
             return this.typeFile;
+        }
+        
+        public String getRootDir(){
+            return this.rootDir;
         }
 }

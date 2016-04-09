@@ -122,6 +122,7 @@ public class Server {
             }
             
             if(cmd.isNetwork()){
+                pw.printf(cmd.getResponse() + "\r\n");
                 sock = ((INetwork)cmd).getSocket();
             }else{
                 
@@ -134,10 +135,11 @@ public class Server {
                     sock.close();
                     sock = null;
                 }
+                pw.printf(cmd.getResponse() + "\r\n");
             }
             
             session = cmd.getSessionState();
-            pw.printf(cmd.getResponse() + "\r\n");
+            
         }while(!cmd.getCommand().equals("QUIT"));
         
     }

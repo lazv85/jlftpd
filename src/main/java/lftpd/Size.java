@@ -29,7 +29,7 @@ public class Size extends Command implements ICommand{
         String str = null;
         
         if(responseCode == ResponseCode.CODE_213_File_status){
-            str = "213 " + String.valueOf(fileSize) + " " + param;
+            str = "213 " + String.valueOf(fileSize) ;
         }else{
             str = "550 file: " + param + " not found";
         }
