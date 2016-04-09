@@ -11,7 +11,10 @@ public class Cwd extends Command implements ICommand{
         
         if(Files.exists(newPath) && Files.isDirectory(newPath)){
             responseCode = ResponseCode.CODE_250_Requested_file_action_okay;
-            session.setCurrentDir(newPath.normalize().toString());
+            String p = newPath.normalize().toString();
+            if(p.length() >= session.getRootDir().length()){
+                session.setCurrentDir(p);
+            }
         }else{
             responseCode = ResponseCode.CODE_550_Requested_action_not_taken;   
         }
