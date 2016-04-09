@@ -62,8 +62,8 @@ public class Server {
 
         PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-        pw.println("220 Hey there");
+        
+        pw.printf("220 Hey there\r\n");
 
     }
     
@@ -82,7 +82,7 @@ public class Server {
             
             ICommand usr = CommandFactory.getCommand(br.readLine());
         
-            pw.println(usr.getResponse());
+            pw.printf(usr.getResponse() + "\r\n");
             
             if(usr.getResponseCode() == ResponseCode.CODE_230_User_logged_in && usr.getCommand().equals("USER")){
                 session = new SessionState(usr.getParameter(), cfg.getValue("anonymous_dir","system"), localAddress, remoteAddress);
@@ -97,7 +97,7 @@ public class Server {
                         authorized = true;
                     }
                 }
-                pw.println(pass.getResponse());
+                pw.printf(pass.getResponse()+ "\r\n");
                 pass = null;
             }
             usr = null;
@@ -126,7 +126,7 @@ public class Server {
             }else{
                 
                 if(sock != null && cmd.isData()){
-                    pw.println(cmd.getResponse());
+                    pw.printf(cmd.getResponse()+"\r\n");
                     ((IData)cmd).transferData(sock);
                     sock.close();
                     sock = null;
@@ -137,7 +137,7 @@ public class Server {
             }
             
             session = cmd.getSessionState();
-            pw.println(cmd.getResponse());
+            pw.printf(cmd.getResponse() + "\r\n");
         }while(!cmd.getCommand().equals("QUIT"));
         
     }

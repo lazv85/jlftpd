@@ -63,6 +63,19 @@ class CommandFactory{
         if(cmd[0].equals("CWD")){
             return new Cwd(cmd[0],cmd[1],session);
         }
+        
+        if(cmd[0].equals("TYPE")){
+            return new Type(cmd[0],cmd[1],session);
+        }
+        
+        if(cmd[0].equals("SIZE")){
+            return new Size(cmd[0],cmd[1],session);
+        }
+        
+        if(cmd[0].equals("PASV")){
+            return new Pasv(cmd[0],cmd[1],session);
+        }
+        
         return new Command(commandText,null, session);
     }
 }

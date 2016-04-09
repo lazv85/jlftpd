@@ -7,6 +7,7 @@ public class ResponseCode{
     public static final int CODE_125_Data_connection_already_open = 125;
     public static final int CODE_150_File_status_okay = 150;
     
+    public static final int CODE_200_Action_successfully_completed = 200;
     public static final int CODE_202_Command_not_implemented = 202;
     public static final int CODE_211_System_status = 211;
     public static final int CODE_212_Directory_status = 212;

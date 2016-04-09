@@ -11,6 +11,7 @@
         private String permissions;
         private String localAddress;
         private String remoteAddress;
+        private String typeFile;
         
         public SessionState(String userName,String userSettings, String localAddress, String remoteAddress){
             this.userName = userName;
@@ -59,5 +60,13 @@
         
         public String getRemoteAddress(){
             return this.remoteAddress;
+        }
+        
+        public void setTypeFile(String typeFile){
+            this.typeFile = typeFile;
+        }
+        
+        public String getTypeFile(){
+            return this.typeFile;
         }
 }
