@@ -12,7 +12,8 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 import java.text.SimpleDateFormat;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class List extends Command implements ICommand, IData{
     
@@ -34,48 +35,57 @@ public class List extends Command implements ICommand, IData{
         }
         return null;
     }
-    
+ 
+    private String getFileItem(String fileName, String pathToFile) throws Exception{
+        Path p = Paths.get(pathToFile + "/" + fileName);
+        PosixFileAttributes attrs = Files.readAttributes(p,PosixFileAttributes.class);
+        Set<PosixFilePermission> posixPermissions = Files.getPosixFilePermissions(p);
+
+        String owner = attrs.owner().getName();
+        String group = attrs.group().getName();
+        String perms = PosixFilePermissions.toString(posixPermissions);
+                    
+        File cf = new File(p.toString());
+                    
+        perms = cf.isDirectory() ? ("d"+perms) : ("-"+perms);
+                        
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd HH:mm");
+        String linkCount = Files.getAttribute(p, "unix:nlink").toString();
+                    
+        String item ;
+                    
+        item = perms + " ";
+        item += String.format("%4d", Integer.parseInt(linkCount)) + " ";
+        item += owner + " ";
+        item += group + " ";
+        item += String.format("%12d", cf.length())  + " ";
+        item += sdf.format(cf.lastModified()) + " ";
+        item += fileName;
+        return item;
+    }   
 
     private String listFiles(){
 
         String str = "";
         try{
-            File f = new File(session.getCurrentDir());
+            Path p;
             
+            if(param == null){
+                p = Paths.get(session.getCurrentDir()).normalize();
+            }else if(param.substring(0,1).equals("/")){
+                p = Paths.get(session.getRootDir() + "/" + param).normalize();
+            }else{
+                p = Paths.get(session.getCurrentDir() +"/" + param).normalize();
+            }
+            
+            File f = new File(p.toString());
             if(f.isDirectory()){
                 String []content = f.list();
                 for(String i : content){
-                    Path p = Paths.get(session.getCurrentDir() + "/" + i);
-                    PosixFileAttributes attrs = Files.readAttributes(p,PosixFileAttributes.class);
-                    Set<PosixFilePermission> posixPermissions = Files.getPosixFilePermissions(p);
-
-                    String owner = attrs.owner().getName();
-                    String group = attrs.group().getName();
-                    String perms = PosixFilePermissions.toString(posixPermissions);
-                    
-                    File cf = new File(p.toString());
-                    
-                    if(cf.isDirectory()){
-                        perms = "d" + perms;
-                    }else{
-                        perms = "-" + perms;
-                    }
-                    
-                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd HH:mm");
-                    String linkCount = Files.getAttribute(p, "unix:nlink").toString();
-                    
-                    String item ;
-                    
-                    item = perms + " ";
-                    item += String.format("%4d", Integer.parseInt(linkCount)) + " ";
-                    item += owner + " ";
-                    item += group + " ";
-                    item += String.format("%12d", cf.length())  + " ";
-                    item += sdf.format(cf.lastModified()) + " ";
-                    item += i + " ";
-
-                    str += item + "\r\n" ;
+                    str += getFileItem(i, p.toString()) + "\r\n" ;
                 }
+            }else{
+                str = getFileItem(param,p.toString()) + "\r\n" ;
             }
         }catch(Exception e){
             responseCode = ResponseCode.CODE_451_Requested_action_aborted;
