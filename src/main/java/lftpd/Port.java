@@ -16,20 +16,24 @@ public class Port extends Command implements ICommand, INetwork{
     public Port(String cmd, String param, SessionState session){
         super(cmd,param,session);
         
-        Pattern ptr = Pattern.compile("(\\d+,\\d+,\\d+,\\d+),(\\d+),(\\d+)");
-        Matcher m = ptr.matcher(param);
-        
-        if(m.find()){
-            remoteIpAddr = m.group(1).replace(',','.');
-            remotePort = Integer.parseInt(m.group(2))*256 + Integer.parseInt(m.group(3));
-
-            try {
-             sock = new Socket( InetAddress.getByName(remoteIpAddr) , remotePort);
-             responseCode = ResponseCode.CODE_200_Action_successfully_completed;    
-            } catch(Exception e) {
-             responseCode = ResponseCode.CODE_425_Cant_open_data_connection;    
-            }
+        if(param != null){
+            Pattern ptr = Pattern.compile("(\\d+,\\d+,\\d+,\\d+),(\\d+),(\\d+)");
+            Matcher m = ptr.matcher(param);
             
+            if(m.find()){
+                remoteIpAddr = m.group(1).replace(',','.');
+                remotePort = Integer.parseInt(m.group(2))*256 + Integer.parseInt(m.group(3));
+    
+                try {
+                 sock = new Socket( InetAddress.getByName(remoteIpAddr) , remotePort);
+                 responseCode = ResponseCode.CODE_200_Action_successfully_completed;    
+                } catch(Exception e) {
+                 responseCode = ResponseCode.CODE_425_Cant_open_data_connection;    
+                }
+                
+            }else{
+                responseCode = ResponseCode.CODE_501_Syntax_error_in_parameters;
+            }
         }else{
             responseCode = ResponseCode.CODE_501_Syntax_error_in_parameters;
         }

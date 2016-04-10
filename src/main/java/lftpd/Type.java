@@ -3,13 +3,16 @@ package lftpd;
 public class Type extends Command implements ICommand{
     public Type(String cmd, String param, SessionState session){
         super(cmd,param,session);
-        if(param.equals("A") ||
-            param.equals("I") )
-        {
-            session.setTypeFile(param);
-            responseCode = ResponseCode.CODE_200_Action_successfully_completed;
-        }else
-        {
+        if(param != null){
+            if(param.equals("A") || param.equals("I") ) {
+                session.setTypeFile(param);
+                responseCode = ResponseCode.CODE_200_Action_successfully_completed;
+            }else {
+                session.setTypeFile(null);
+                responseCode = ResponseCode.CODE_501_Syntax_error_in_parameters;
+            }
+        }else{
+            session.setTypeFile(null);
             responseCode = ResponseCode.CODE_501_Syntax_error_in_parameters;
         }
     }
@@ -20,7 +23,7 @@ public class Type extends Command implements ICommand{
         if(responseCode == ResponseCode.CODE_200_Action_successfully_completed){
             str = "200 TYPE set to " + session.getTypeFile();
         }else{
-            str = "501 Unsupported parameters for Type command: " + session.getTypeFile();
+            str = "501 Unsupported parameters for Type command";
         }
         return str;
     }

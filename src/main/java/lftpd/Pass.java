@@ -23,16 +23,20 @@ public class Pass extends Command implements ICommand{
     }
    
     public void authorize(String userName){
-        String str = cfg.getValue(userName,"users");
+        String str = cfg.getValue(userName,"users") ;
         Pattern ptr = Pattern.compile("([^:]+):([^:]+):([^:]+)");
         
-        Matcher m = ptr.matcher(str);
-        
-        if(m.find()){
-            String configPassword = m.group(1);
-            responseCode = ResponseCode.CODE_430_Invalid_username_or_password;
-            if(configPassword.equals(param)){
-                responseCode = ResponseCode.CODE_230_User_logged_in;
+        if(str != null){
+            Matcher m = ptr.matcher(str);
+            
+            if(m.find()){
+                String configPassword = m.group(1);
+                responseCode = ResponseCode.CODE_430_Invalid_username_or_password;
+                if(configPassword.equals(param)){
+                    responseCode = ResponseCode.CODE_230_User_logged_in;
+                }
+            }else{
+                responseCode = ResponseCode.CODE_430_Invalid_username_or_password;
             }
         }else{
             responseCode = ResponseCode.CODE_430_Invalid_username_or_password;

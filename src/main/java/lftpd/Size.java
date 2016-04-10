@@ -12,7 +12,9 @@ public class Size extends Command implements ICommand{
     public Size(String cmd, String param, SessionState session){
         super(cmd, param, session);
         
-        Path filePath = Paths.get(session.getCurrentDir() + "/" + param).normalize();
+        Path filePath = param != null ? 
+            Paths.get(session.getCurrentDir() + "/" + param).normalize() :
+            Paths.get(session.getCurrentDir() ).normalize();
         
         if(Files.exists(filePath)){
             File f = new File(filePath.toString());
