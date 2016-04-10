@@ -14,8 +14,6 @@ public class User extends Command implements ICommand{
         }else{
             responseCode = ResponseCode.CODE_331_User_name_ok_need_password;
         }
-        
-        
     }
     
     @Override

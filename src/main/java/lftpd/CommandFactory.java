@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 class CommandFactory{
     
     private static String[] getCommandDetails(String commandText){
-        Pattern ptr = Pattern.compile("([a-zA-Z]+)(\\s+([a-zA-Z0-9,\\.\\/]+))?");
+        Pattern ptr = Pattern.compile("([a-zA-Z]+)(\\s+([^\\r^\\n]+))?");
         
         Matcher m = ptr.matcher(commandText);
         

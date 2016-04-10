@@ -99,7 +99,7 @@ public class ConfigTest{
 
             configIntance.parseFile(absolutePath);
             assertEquals("yes",configIntance.getValue("anonymous_access","system"));
-            assertEquals("/home/ubuntu/workspace:rw",configIntance.getValue("anonymous_dir","system"));
+            assertEquals("1:/home/ubuntu/workspace:rw",configIntance.getValue("anonymous_dir","system"));
             assertEquals("123456:/home/ubuntu/workspace:rw",configIntance.getValue("john","users"));
             assertEquals("1234567:/home/ubuntu/workspace/src:rw",configIntance.getValue("bob","users"));
             assertNull(configIntance.getValue("bob","users1"));

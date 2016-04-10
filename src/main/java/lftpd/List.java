@@ -19,6 +19,11 @@ public class List extends Command implements ICommand, IData{
     
     public List(String cmd, String param, SessionState session){
         super(cmd, param, session);
+        if(param != null){
+            if(param.equals("-l")){
+                this.param = null;
+            }
+        }
         responseCode = ResponseCode.CODE_150_File_status_okay;
     }
     
