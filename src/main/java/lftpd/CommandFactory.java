@@ -76,6 +76,13 @@ class CommandFactory{
             return new Pasv(cmd[0],cmd[1],session);
         }
         
+        if(cmd[0].equals("EPRT")){
+            return new Eprt(cmd[0],cmd[1],session);
+        }
+        
+        if(cmd[0].equals("EPSV")){
+            return new Epsv(cmd[0],cmd[1],session);
+        }
         return new Command(commandText,null, session);
     }
 }
