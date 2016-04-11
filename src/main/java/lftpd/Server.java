@@ -30,6 +30,7 @@ public class Server {
                 serveClient(sock, session);
             }catch(Exception e){
                 log.log(Level.INFO, "thread completed");
+                log.log(Level.INFO, e.toString());
             }
         }
     }
