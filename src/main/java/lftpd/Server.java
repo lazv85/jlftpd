@@ -27,7 +27,14 @@ public class Server {
                 
                 sayHello(sock);
                 session = authorize(sock);
-                serveClient(sock, session);
+                
+                if(session != null){
+                    serveClient(sock, session);
+                }
+                    
+                 try{
+                    sock.close();
+                 }catch (IOException e){}
             }catch(Exception e){
                 log.log(Level.INFO, "thread completed");
                 log.log(Level.INFO, e.toString());
@@ -71,18 +78,20 @@ public class Server {
     private SessionState authorize(Socket clientSocket) throws IOException{
         
         boolean authorized = false;
-        SessionState session = new SessionState();
+        SessionState session = null;
         
         
         PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
         BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        ICommand lastCmd = null;
         
         do{
             String remoteAddress = clientSocket.getInetAddress().getHostAddress();
             String localAddress = clientSocket.getLocalAddress().getHostAddress(); 
             
             ICommand usr = CommandFactory.getCommand(br.readLine());
-        
+            lastCmd = usr;
+            
             pw.printf(usr.getResponse() + "\r\n");
             
             if(usr.getResponseCode() == ResponseCode.CODE_230_User_logged_in && usr.getCommand().equals("USER")){
@@ -90,6 +99,7 @@ public class Server {
                 authorized = true;
             }else if(usr.getResponseCode() != ResponseCode.CODE_230_User_logged_in && usr.getCommand().equals("USER")){
                 ICommand pass = CommandFactory.getCommand(br.readLine());
+                lastCmd = pass;
                 
                 if(pass.getCommand().equals("PASS")){
                     ((Pass)pass).authorize(usr.getParameter());
@@ -102,7 +112,7 @@ public class Server {
                 pass = null;
             }
             usr = null;
-        }while(!authorized);
+        }while(!authorized && !lastCmd.getCommand().equals("QUIT") );
         
         return session;
     }
@@ -142,7 +152,6 @@ public class Server {
             session = cmd.getSessionState();
             
         }while(!cmd.getCommand().equals("QUIT"));
-        
     }
      
     private int getServerPort(){

@@ -14,6 +14,8 @@ public class Command implements ICommand{
     
     @Override
     public boolean isNetwork(){
+        if(this.cmd == null) return false;
+        
         if(this.cmd.equals("PORT") || this.cmd.equals("PASV") || this.cmd.equals("EPRT") || this.cmd.equals("EPSV")){
             return true;
         }else{
@@ -23,6 +25,8 @@ public class Command implements ICommand{
     
     @Override
     public boolean isData(){
+        if(this.cmd == null) return false;
+        
         if(this.cmd.equals("LIST")){
             return true;
         }else{
@@ -32,6 +36,8 @@ public class Command implements ICommand{
     
     @Override
     public String getCommand(){
+        if(this.cmd == null) return " ";
+        
         return this.cmd;
     }
     
@@ -42,7 +48,10 @@ public class Command implements ICommand{
     
     @Override
     public String getResponse(){
-        String str = "202 command: " + this.cmd + " is not implemented" ;
+        String outCmd = " ";
+        if(cmd != null) outCmd = this.cmd;
+        
+        String str = "202 command: " + outCmd + " is not implemented" ;
         return str;
     }
     

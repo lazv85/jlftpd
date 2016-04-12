@@ -26,8 +26,8 @@ class CommandFactory{
     public static ICommand getCommand(String commandText, SessionState session){
         String []cmd = getCommandDetails(commandText);
         
-        if(cmd.length == 0){
-            return new Command(commandText,null, session);
+        if(cmd == null){
+            return new Command(" ",null, session);
         }
         
         System.out.println("cmd = " + cmd[0]);
@@ -82,6 +82,10 @@ class CommandFactory{
         
         if(cmd[0].equals("EPSV")){
             return new Epsv(cmd[0],cmd[1],session);
+        }
+        
+        if(cmd[0].equals("MDTM")){
+            return new Mdtm(cmd[0],cmd[1],session);
         }
         return new Command(commandText,null, session);
     }
