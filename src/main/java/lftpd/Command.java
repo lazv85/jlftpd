@@ -27,7 +27,7 @@ public class Command implements ICommand{
     public boolean isData(){
         if(this.cmd == null) return false;
         
-        if(this.cmd.equals("LIST")){
+        if(this.cmd.equals("LIST") || this.cmd.equals("RETR") ){
             return true;
         }else{
             return false;

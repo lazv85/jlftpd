@@ -12,6 +12,7 @@
         private String localAddress;
         private String remoteAddress;
         private String typeFile;
+        private final String separator = System.getProperty("file.separator");
         
         public SessionState(String userName,String userSettings, String localAddress, String remoteAddress){
             this.userName = userName;
@@ -31,6 +32,11 @@
                 currentDir = "/";
                 rootDir = "/";
                 permissions = "r";
+            }
+            
+            if(separator.equals("\\")){
+                currentDir = "C:" + currentDir;
+                rootDir = "C:" + rootDir;
             }
         }
         

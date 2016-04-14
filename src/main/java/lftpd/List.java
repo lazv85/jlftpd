@@ -42,16 +42,15 @@ public class List extends Command implements ICommand, IData{
     }
  
     private String getFileItem(String fileName, String pathToFile) throws Exception{
-        Path p = Paths.get(pathToFile + "/" + fileName);
+        Path p = Paths.get(pathToFile + "/" + fileName).normalize();
         PosixFileAttributes attrs = Files.readAttributes(p,PosixFileAttributes.class);
         Set<PosixFilePermission> posixPermissions = Files.getPosixFilePermissions(p);
 
         String owner = attrs.owner().getName();
         String group = attrs.group().getName();
         String perms = PosixFilePermissions.toString(posixPermissions);
-                    
+                  
         File cf = new File(p.toString());
-                    
         perms = cf.isDirectory() ? ("d"+perms) : ("-"+perms);
                         
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd HH:mm");
@@ -66,6 +65,7 @@ public class List extends Command implements ICommand, IData{
         item += String.format("%12d", cf.length())  + " ";
         item += sdf.format(cf.lastModified()) + " ";
         item += fileName;
+        
         return item;
     }   
 

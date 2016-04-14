@@ -15,7 +15,6 @@ public class Eprt extends Command implements ICommand, INetwork{
     public Eprt(String cmd, String param, SessionState session){
         super(cmd, param, session);
         
-        System.out.println("regexp = " + "\\|([12])\\|([\\:0-9]+)\\|(\\d+)\\|");
         if(param != null){
             Pattern ptr = Pattern.compile("\\|([12])\\|([\\:0-9]+)\\|(\\d+)\\|");
             Matcher m = ptr.matcher(param);
