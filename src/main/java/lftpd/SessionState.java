@@ -79,4 +79,8 @@
         public String getRootDir(){
             return this.rootDir;
         }
+        
+        public String getSeparator(){
+            return this.separator;
+        }
 }

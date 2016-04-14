@@ -14,6 +14,8 @@ import java.util.Set;
 import java.text.SimpleDateFormat;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileOwnerAttributeView;
+import java.nio.file.attribute.UserPrincipal;
 
 public class List extends Command implements ICommand, IData{
     
@@ -41,18 +43,19 @@ public class List extends Command implements ICommand, IData{
         return null;
     }
  
-    private String getFileItem(String fileName, String pathToFile) throws Exception{
+    private String getUnixFileItem(String fileName, String pathToFile) throws Exception{
         Path p = Paths.get(pathToFile + "/" + fileName).normalize();
+
         PosixFileAttributes attrs = Files.readAttributes(p,PosixFileAttributes.class);
         Set<PosixFilePermission> posixPermissions = Files.getPosixFilePermissions(p);
 
         String owner = attrs.owner().getName();
         String group = attrs.group().getName();
         String perms = PosixFilePermissions.toString(posixPermissions);
-                  
+
         File cf = new File(p.toString());
         perms = cf.isDirectory() ? ("d"+perms) : ("-"+perms);
-                        
+                    
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd HH:mm");
         String linkCount = Files.getAttribute(p, "unix:nlink").toString();
                     
@@ -65,6 +68,44 @@ public class List extends Command implements ICommand, IData{
         item += String.format("%12d", cf.length())  + " ";
         item += sdf.format(cf.lastModified()) + " ";
         item += fileName;
+        
+        return item;
+    }
+    
+    private String getWindowsFileItem(String fileName, String pathToFile) throws Exception{
+        Path p = Paths.get(pathToFile + "/" + fileName).normalize();
+       
+        File cf = new File(p.toString());
+        String item ="";
+       
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd HH:mm"); 
+        String linkCount = "1";
+       
+         
+        item += cf.isDirectory() ? "d" : "-";
+        item += cf.canRead() ? "r" : "-";
+        item += cf.canWrite() ? "w" : "-";
+        item += "x---- ";
+       
+        item += String.format("%4d", Integer.parseInt(linkCount)) + " ";
+        item += "win win ";
+        item += String.format("%12d", cf.length())  + " ";
+        item += sdf.format(cf.lastModified()) + " ";
+        item += fileName;
+        
+        return item;
+    }
+    
+    private String getFileItem(String fileName, String pathToFile) throws Exception{
+                    
+        String item ;
+        
+        if (session.getSeparator().equals("/")){
+           item =  getUnixFileItem(fileName, pathToFile);
+        }else{
+            item =  getWindowsFileItem(fileName, pathToFile);
+        }
         
         return item;
     }   

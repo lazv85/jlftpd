@@ -39,7 +39,4 @@ public class Cwd extends Command implements ICommand{
             return "550 failed to change directory";
         }
     }
-    
-    
-   
 }
