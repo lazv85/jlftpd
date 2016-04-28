@@ -44,9 +44,9 @@ public class Retr extends Command implements ICommand, IData{
             try{
                 FileInputStream f = new FileInputStream(p.toString());
                 int c;
-    
-                while ((c = f.read()) != -1) {
-                    os.write(c);
+                byte []bs = new byte[1024];
+                while ((c = f.read(bs)) != -1) {
+                    os.write(bs,0, c );
                 }
                 responseCode = ResponseCode.CODE_226_Closing_data_connection;
             }catch(IOException e){

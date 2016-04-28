@@ -147,6 +147,7 @@ public class List extends Command implements ICommand, IData{
             String content = listFiles();
             
             pw.printf(content);
+            content = null;
             responseCode = ResponseCode.CODE_226_Closing_data_connection;
         }catch(Exception e){
             responseCode = ResponseCode.CODE_426_Connection_closed_aborted;
