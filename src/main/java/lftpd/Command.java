@@ -36,7 +36,7 @@ public class Command implements ICommand{
     
     @Override
     public String getCommand(){
-        if(this.cmd == null) return " ";
+        if(this.cmd == null) return "  ";
         
         return this.cmd;
     }
