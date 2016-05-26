@@ -91,6 +91,14 @@ class CommandFactory{
         if(cmd[0].equals("RETR")){
             return new Retr(cmd[0],cmd[1],session);
         }
+        
+        if(cmd[0].equals("MKD")){
+            return new Mkd(cmd[0],cmd[1],session);
+        }
+        
+        if(cmd[0].equals("RMD")){
+            return new Rmd(cmd[0],cmd[1],session);
+        }
         return new Command(commandText,null, session);
     }
 }
